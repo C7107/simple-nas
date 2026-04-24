@@ -51,6 +51,9 @@ func InitRouter() *gin.Engine {
 		authGroup.GET("/thumb/:name", handler.ServeFastThumb)
 
 		// ======= 【新增：抖音式视频流】 =======
+		// ======= 【新增：相册精典 - 随机30个文件】 =======
+		authGroup.GET("/files/classic", handler.RandomClassic)
+
 		authGroup.GET("/videos/feed", handler.VideoFeed)
 
 		// ======= 【新增：删除文件】 =======

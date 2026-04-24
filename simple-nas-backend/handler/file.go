@@ -38,6 +38,29 @@ func ListFiles(c *gin.Context) {
 	utils.Success(c, resList, "获取成功")
 }
 
+func RandomClassic(c *gin.Context) {
+	var files []model.File
+	database.DB.Preload("Folder").Order("RANDOM()").Limit(36).Find(&files)
+
+	var resList []map[string]interface{}
+	for _, f := range files {
+		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + f.FileName
+		item := map[string]interface{}{
+			"id":            f.ID,
+			"original_name": f.OriginalName,
+			"file_type":     f.FileType,
+			"size":          f.Size,
+			"created_at":    f.CreatedAt.Format("2006-01-02 15:04:05"),
+			"url":           physicalUrl,
+		}
+		if f.ThumbName != "" {
+			item["thumb_url"] = "/api/thumb/" + f.ThumbName
+		}
+		resList = append(resList, item)
+	}
+	utils.Success(c, resList, "获取经典相册成功")
+}
+
 func VideoFeed(c *gin.Context) {
 	sizeStr := c.DefaultQuery("size", "3")
 	size, _ := strconv.Atoi(sizeStr)

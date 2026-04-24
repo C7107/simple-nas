@@ -4,6 +4,7 @@ simple-nas-backend/nas.db
 
 # ===== 前端 =====
 simple-nas-frontend/node_modules/
+simple-nas-frontend/.expo/
 
 # ===== 通用 =====
 node_modules/

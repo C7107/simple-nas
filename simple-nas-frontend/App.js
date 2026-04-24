@@ -9,6 +9,7 @@ import LoginScreen from './screens/LoginScreen';
 import GalleryScreen from './screens/GalleryScreen';
 import UploadScreen from './screens/UploadScreen';
 import VideoPlayerScreen from './screens/VideoPlayerScreen';
+import ClassicScreen from './screens/ClassicScreen';
 import FeedScreen from './screens/FeedScreen';
 import FolderScreen from './screens/FolderScreen';
 
@@ -23,6 +24,7 @@ function MainTabs() {
         tabBarIcon: ({ color, size }) => {
           let iconName;
           if (route.name === 'Gallery') iconName = 'images';
+          else if (route.name === 'Classic') iconName = 'star';
           else if (route.name === 'Upload') iconName = 'cloud-upload';
           else if (route.name === 'Feed') iconName = 'play-circle';
           else if (route.name === 'Folder') iconName = 'folder'; // 【新增：文件夹图标】
@@ -32,10 +34,17 @@ function MainTabs() {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-      <Tab.Screen 
-        name="Gallery" 
-        component={GalleryScreen} 
-        options={{ title: '我的相册', headerStyle: { backgroundColor: '#fff' } }} 
+      <Tab.Screen
+        name="Gallery"
+        component={GalleryScreen}
+        options={{ title: '我的相册', headerStyle: { backgroundColor: '#fff' } }}
+      />
+
+            {/* ===== 【新增：相册精典页面】 ===== */}
+      <Tab.Screen
+        name="Classic"
+        component={ClassicScreen}
+        options={{ title: '精典相册', headerStyle: { backgroundColor: '#fff' } }}
       />
 
             {/* ===== 【新增：刷视频页面】 ===== */}
