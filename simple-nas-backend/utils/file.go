@@ -16,6 +16,10 @@ func GetFileType(ext string) string {
 		return "image"
 	case ".mp4", ".mov", ".avi", ".mkv", ".webm", ".flv":
 		return "video"
+	case ".txt":
+		return "text"
+	case ".html", ".htm":
+		return "html"
 	default:
 		return "unknown"
 	}

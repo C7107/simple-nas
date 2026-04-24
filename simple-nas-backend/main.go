@@ -34,6 +34,8 @@ func initStorageDirs() {
 	dirs := []string{
 		"storage/默认",
 		"storage/thumbs",
+		"storage/文本文档",
+		"storage/网页文件",
 	}
 
 	for _, dir := range dirs {

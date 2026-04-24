@@ -57,7 +57,40 @@ const MediaItem = memo(({
   onPress, onLongPress,
 }) => {
   const isVideo = item.file_type === 'video';
+  const isText = item.file_type === 'text';
+  const isHtml = item.file_type === 'html';
+  const isDocument = isText || isHtml;
   const isSelected = selectedIdsSet.has(item.id);
+
+  if (isDocument) {
+    return (
+      <TouchableOpacity
+        style={styles.mediaContainer}
+        activeOpacity={0.8}
+        onPress={() => onPress(item)}
+        onLongPress={() => onLongPress(item)}
+      >
+        <View style={[styles.docBox, isSelected && styles.selectedImage]}>
+          <Ionicons
+            name={isText ? 'document-text' : 'code-slash'}
+            size={36}
+            color={isText ? '#4A90D9' : '#E67E22'}
+          />
+          <Text style={styles.docName} numberOfLines={2}>{item.original_name}</Text>
+        </View>
+        {isSelectMode && (
+          <View style={styles.checkboxContainer}>
+            {isSelected ? (
+              <Ionicons name="checkmark-circle" size={24} color="#007AFF" />
+            ) : (
+              <Ionicons name="ellipse-outline" size={24} color="rgba(255,255,255,0.8)" />
+            )}
+          </View>
+        )}
+      </TouchableOpacity>
+    );
+  }
+
   const thumbPath = item.thumb_url || item.url;
   const imageUrl = thumbPath
     ? `${authData.baseUrl}${thumbPath}?token=${authData.token}`
@@ -400,6 +433,12 @@ export default function FolderScreen({ navigation }) {
           navigation.navigate('VideoPlayer', {
             videoUrl: `${authData.baseUrl}${item.url}?token=${authData.token}`,
             title: item.original_name,
+          });
+        } else if (item.file_type === 'text' || item.file_type === 'html') {
+          navigation.navigate('FileViewer', {
+            fileUrl: `${authData.baseUrl}${item.url}?token=${authData.token}`,
+            title: item.original_name,
+            fileType: item.file_type,
           });
         } else {
           const index = findImageIndex(item.id);
@@ -822,6 +861,12 @@ const styles = StyleSheet.create({
   },
   folderName: { fontSize: 14, color: '#333', marginTop: 8, fontWeight: '500' },
   folderCount: { fontSize: 12, color: '#999', marginTop: 2 },
+
+  docBox: {
+    width: '100%', height: '100%', backgroundColor: '#f8f9fa',
+    justifyContent: 'center', alignItems: 'center', padding: 6,
+  },
+  docName: { fontSize: 9, color: '#666', marginTop: 4, textAlign: 'center' },
 
   mediaContainer: { width: itemSize, height: itemSize, margin: 1, position: 'relative' },
   mediaImage: { width: '100%', height: '100%', backgroundColor: '#f0f0f0' },

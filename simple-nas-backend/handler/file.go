@@ -15,7 +15,7 @@ import (
 func ListFiles(c *gin.Context) {
 	var files []model.File
 	// 【核心修复 Bug2】：用 Preload 提前查出 Folder
-	database.DB.Preload("Folder").Order("created_at desc").Find(&files)
+	database.DB.Preload("Folder").Where("file_type NOT IN ?", []string{"text", "html"}).Order("created_at desc").Find(&files)
 
 	var resList []map[string]interface{}
 	for _, f := range files {
@@ -40,7 +40,7 @@ func ListFiles(c *gin.Context) {
 
 func RandomClassic(c *gin.Context) {
 	var files []model.File
-	database.DB.Preload("Folder").Order("RANDOM()").Limit(36).Find(&files)
+	database.DB.Preload("Folder").Where("file_type NOT IN ?", []string{"text", "html"}).Order("RANDOM()").Limit(36).Find(&files)
 
 	var resList []map[string]interface{}
 	for _, f := range files {

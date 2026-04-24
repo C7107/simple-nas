@@ -12,6 +12,7 @@ import VideoPlayerScreen from './screens/VideoPlayerScreen';
 import ClassicScreen from './screens/ClassicScreen';
 import FeedScreen from './screens/FeedScreen';
 import FolderScreen from './screens/FolderScreen';
+import FileViewerScreen from './screens/FileViewerScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -89,15 +90,27 @@ export default function App() {
         <Stack.Screen name="Main" component={MainTabs} options={{ headerShown: false }} />
         
         {/* 视频播放器页 (覆盖在主界面之上的 Stack) */}
-        <Stack.Screen 
-          name="VideoPlayer" 
-          component={VideoPlayerScreen} 
-          options={({ route }) => ({ 
+        <Stack.Screen
+          name="VideoPlayer"
+          component={VideoPlayerScreen}
+          options={({ route }) => ({
             title: route.params.title || '视频播放',
-            headerStyle: { backgroundColor: '#000' }, // 播放器头部用黑色
+            headerStyle: { backgroundColor: '#000' },
             headerTintColor: '#fff',
             headerBackTitle: '返回'
-          })} 
+          })}
+        />
+
+        {/* 文本/HTML 文件查看器 */}
+        <Stack.Screen
+          name="FileViewer"
+          component={FileViewerScreen}
+          options={({ route }) => ({
+            title: route.params.title || '文件浏览',
+            headerStyle: { backgroundColor: '#fff' },
+            headerTintColor: '#007AFF',
+            headerBackTitle: '返回'
+          })}
         />
       </Stack.Navigator>
     </NavigationContainer>

@@ -23,8 +23,21 @@ func ProcessUpload(c *gin.Context, file *multipart.FileHeader) error {
 		return fmt.Errorf("不支持的文件格式: %s", ext)
 	}
 
+	// 根据文件类型决定目标文件夹
+	var targetFolder model.Folder
 	saveDir := "storage/默认"
+	folderID := uint(1)
 
+	if fileType == "text" {
+		database.DB.Where("name = ?", "文本文档").First(&targetFolder)
+	} else if fileType == "html" {
+		database.DB.Where("name = ?", "网页文件").First(&targetFolder)
+	}
+
+	if targetFolder.ID != 0 {
+		saveDir = filepath.Join("storage", targetFolder.Name)
+		folderID = targetFolder.ID
+	}
 
 	finalName := utils.GenerateUniqueFileName(saveDir, originalName)
 	savePath := filepath.Join(saveDir, finalName)
@@ -34,7 +47,7 @@ func ProcessUpload(c *gin.Context, file *multipart.FileHeader) error {
 	}
 
 	fileRecord := model.File{
-		FolderID:     1,
+		FolderID:     folderID,
 		OriginalName: originalName,
 		FileName:     finalName,
 		FileType:     fileType,
