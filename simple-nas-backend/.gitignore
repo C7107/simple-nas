@@ -1,0 +1,8 @@
+﻿/storage/
+simple-nas-backend
+*.exe
+*.db
+*.sqlite
+.env
+.idea/
+.vscode/

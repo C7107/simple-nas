@@ -1,0 +1,23 @@
+# ===== 后端 =====
+simple-nas-backend/storage/
+simple-nas-backend/nas.db
+
+# ===== 前端 =====
+simple-nas-frontend/node_modules/
+
+# ===== 通用 =====
+node_modules/
+.env
+.env.*
+*.log
+*.db
+.DS_Store
+Thumbs.db
+
+# ===== IDE =====
+.vscode/
+.idea/
+
+# ===== build =====
+dist/
+build/
