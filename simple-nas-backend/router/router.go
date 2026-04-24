@@ -58,6 +58,8 @@ func InitRouter() *gin.Engine {
 
 		// ======= 【新增：删除文件】 =======
 		authGroup.DELETE("/file/:id", handler.DeleteFile)
+		// ======= 【新增：重命名文件】 =======
+		authGroup.PUT("/file/:id/rename", handler.RenameFile)
 
 		// ======= 【新增：文件管理系统 API】 =======
 		// 1. 新建文件夹

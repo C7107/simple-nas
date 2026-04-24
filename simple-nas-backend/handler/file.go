@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/url"
+	"os"
 	"path/filepath"
 	"strconv"
 
@@ -105,6 +106,59 @@ func DeleteFile(c *gin.Context) {
 	}
 	database.DB.Delete(&file)
 	utils.Success(c, nil, "已移至回收站")
+}
+
+func RenameFile(c *gin.Context) {
+	id := c.Param("id")
+	var req struct {
+		NewName string `json:"new_name" binding:"required"`
+	}
+	if err := c.ShouldBindJSON(&req); err != nil || req.NewName == "" {
+		utils.Fail(c, "新文件名不能为空")
+		return
+	}
+
+	var file model.File
+	if err := database.DB.First(&file, id).Error; err != nil {
+		utils.Fail(c, "文件不存在")
+		return
+	}
+
+	var folder model.Folder
+	database.DB.First(&folder, file.FolderID)
+
+	// 检查同目录下是否有同名文件
+	var count int64
+	database.DB.Model(&model.File{}).Where("folder_id = ? AND file_name = ? AND id != ?", file.FolderID, req.NewName, file.ID).Count(&count)
+	if count > 0 {
+		utils.Fail(c, "该目录下已存在同名文件")
+		return
+	}
+
+	oldPath := filepath.Join("storage", folder.Name, file.FileName)
+	newPath := filepath.Join("storage", folder.Name, req.NewName)
+
+	if err := os.Rename(oldPath, newPath); err != nil {
+		utils.Fail(c, "重命名失败: "+err.Error())
+		return
+	}
+
+	// 如果有缩略图，也重命名缩略图
+	if file.ThumbName != "" {
+		oldThumb := filepath.Join("storage/thumbs", file.ThumbName)
+		newThumbName := req.NewName + ".jpg"
+		newThumb := filepath.Join("storage/thumbs", newThumbName)
+		if err := os.Rename(oldThumb, newThumb); err == nil {
+			database.DB.Model(&file).Update("thumb_name", newThumbName)
+		}
+	}
+
+	database.DB.Model(&file).Updates(map[string]interface{}{
+		"file_name":     req.NewName,
+		"original_name": req.NewName,
+	})
+
+	utils.Success(c, nil, "重命名成功")
 }
 
 // ===============================================

@@ -171,6 +171,9 @@ export default function FolderScreen({ navigation }) {
   const [isMoveModalVisible, setIsMoveModalVisible] = useState(false);
   const [modalActionType, setModalActionType] = useState('move');
 
+  const [isRenameModalVisible, setIsRenameModalVisible] = useState(false);
+  const [renameText, setRenameText] = useState('');
+
   const [filterType, setFilterType] = useState('all');
   const [sortConfig, setSortConfig] = useState({ key: 'time', asc: false });
   const [isSortMenuVisible, setIsSortMenuVisible] = useState(false);
@@ -408,6 +411,48 @@ export default function FolderScreen({ navigation }) {
     ]);
   }, [selectedIds, authData, currentFolder, fetchFolderFiles, exitSelectMode]);
 
+  // ─── 重命名 ───────────────────────────────────
+  const handleRename = useCallback(async () => {
+    if (selectedIds.length !== 1) return;
+    const file = mediaList.find((f) => f.id === selectedIds[0]);
+    if (!file) return;
+    setRenameText(file.original_name);
+    setIsRenameModalVisible(true);
+  }, [selectedIds, mediaList]);
+
+  const executeRename = useCallback(async () => {
+    if (!renameText.trim()) return Alert.alert('提示', '文件名不能为空');
+    setIsRenameModalVisible(false);
+    setLoading(true);
+    try {
+      const res = await fetch(`${authData.baseUrl}/api/file/${selectedIds[0]}/rename`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${authData.token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ new_name: renameText.trim() }),
+      });
+      const data = await res.json();
+      if (data.code === 200) {
+        if (currentFolder) await fetchFolderFiles(currentFolder);
+        exitSelectMode();
+      } else {
+        Alert.alert('重命名失败', data.msg || '未知错误');
+      }
+    } catch (_) {
+      Alert.alert('重命名失败', '网络错误');
+    } finally {
+      setLoading(false);
+      setRenameText('');
+    }
+  }, [renameText, authData, selectedIds, currentFolder, fetchFolderFiles, exitSelectMode]);
+
+  // ─── 全选 ─────────────────────────────────────
+  const handleSelectAll = useCallback(() => {
+    setSelectedIds(mediaList.map((f) => f.id));
+  }, [mediaList]);
+
   // ─── 文件夹点击 / 长按 ────────────────────────
   const handleFolderPress = useCallback(
     (folder) => { fetchFolderFiles(folder); },
@@ -640,6 +685,17 @@ export default function FolderScreen({ navigation }) {
             <>
               <TouchableOpacity
                 style={styles.actionBtn}
+                onPress={handleSelectAll}
+                disabled={loading}
+              >
+                <Ionicons
+                  name="checkbox"
+                  size={24}
+                  color="#fff"
+                />
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={styles.actionBtn}
                 onPress={() => openMoveModal('restore')}
                 disabled={selectedIds.length === 0 || loading}
               >
@@ -663,6 +719,17 @@ export default function FolderScreen({ navigation }) {
             </>
           ) : (
             <>
+              <TouchableOpacity
+                style={styles.actionBtn}
+                onPress={handleRename}
+                disabled={selectedIds.length !== 1 || loading}
+              >
+                <Ionicons
+                  name="pencil"
+                  size={22}
+                  color={selectedIds.length === 1 ? '#fff' : '#888'}
+                />
+              </TouchableOpacity>
               <TouchableOpacity
                 style={styles.actionBtn}
                 onPress={() => openMoveModal('move')}
@@ -746,6 +813,36 @@ export default function FolderScreen({ navigation }) {
                 <Text style={{ color: '#999', fontSize: 16 }}>取消</Text>
               </TouchableOpacity>
               <TouchableOpacity style={styles.modalBtn} onPress={handleCreateFolder}>
+                <Text style={{ color: '#007AFF', fontSize: 16, fontWeight: 'bold' }}>
+                  确定
+                </Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      {/* ── 重命名 ── */}
+      <Modal visible={isRenameModalVisible} transparent animationType="fade">
+        <View style={styles.modalBg}>
+          <View style={styles.modalBox}>
+            <Text style={styles.modalTitle}>重命名文件</Text>
+            <TextInput
+              style={styles.modalInput}
+              placeholder="请输入新文件名"
+              value={renameText}
+              onChangeText={setRenameText}
+              autoFocus
+              selectTextOnFocus
+            />
+            <View style={styles.modalBtns}>
+              <TouchableOpacity
+                style={styles.modalBtn}
+                onPress={() => { setIsRenameModalVisible(false); setRenameText(''); }}
+              >
+                <Text style={{ color: '#999', fontSize: 16 }}>取消</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.modalBtn} onPress={executeRename}>
                 <Text style={{ color: '#007AFF', fontSize: 16, fontWeight: 'bold' }}>
                   确定
                 </Text>
