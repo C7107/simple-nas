@@ -25,12 +25,23 @@ func GetFileType(ext string) string {
 	}
 }
 
+// SanitizeFileName 替换文件名中的控制字符和特殊符号，防止 URL 编码异常
+func SanitizeFileName(name string) string {
+	var b strings.Builder
+	for _, r := range name {
+		if r < 0x20 || (r >= 0x7F && r <= 0x9F) {
+			b.WriteRune('_')
+		} else {
+			b.WriteRune(r)
+		}
+	}
+	return b.String()
+}
+
 // GenerateUniqueFileName 名字冲突加后缀
-// 比如传了 猫.jpg，如果没冲突就叫 猫.jpg；如果已存在，就变成 猫_1699991234.jpg
 func GenerateUniqueFileName(saveDir, originalName string) string {
-	// 获取后缀名，比如 ".jpg"
+	originalName = SanitizeFileName(originalName)
 	ext := filepath.Ext(originalName)
-	// 获取去掉后缀的文件名，比如 "猫"
 	baseName := strings.TrimSuffix(filepath.Base(originalName), ext)
 
 	finalName := originalName

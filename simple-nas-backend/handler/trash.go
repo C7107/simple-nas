@@ -18,7 +18,7 @@ func GetTrashFiles(c *gin.Context) {
 
 	var resList []map[string]interface{}
 	for _, f := range files {
-		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + f.FileName
+		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + url.PathEscape(f.FileName)
 		item := map[string]interface{}{
 			"id":            f.ID,
 			"original_name": f.OriginalName,

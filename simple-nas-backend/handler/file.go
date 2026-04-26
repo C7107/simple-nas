@@ -21,7 +21,7 @@ func ListFiles(c *gin.Context) {
 	var resList []map[string]interface{}
 	for _, f := range files {
 		// 【提速秘诀】：直接把物理文件夹名字写进 URL 里发给前端
-		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + f.FileName
+		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + url.PathEscape(f.FileName)
 
 		item := map[string]interface{}{
 			"id":            f.ID,
@@ -45,7 +45,7 @@ func RandomClassic(c *gin.Context) {
 
 	var resList []map[string]interface{}
 	for _, f := range files {
-		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + f.FileName
+		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + url.PathEscape(f.FileName)
 		item := map[string]interface{}{
 			"id":            f.ID,
 			"original_name": f.OriginalName,
@@ -80,7 +80,7 @@ func VideoFeed(c *gin.Context) {
 	var resList []map[string]interface{}
 	var idsToUpdate []uint
 	for _, f := range videos {
-		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + f.FileName
+		physicalUrl := "/api/physical/" + url.PathEscape(f.Folder.Name) + "/" + url.PathEscape(f.FileName)
 		item := map[string]interface{}{
 			"id":            f.ID,
 			"original_name": f.OriginalName,
